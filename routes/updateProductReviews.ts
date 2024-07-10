@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
+import * as mongoSanitize from 'express-mongo-sanitize'
 import challengeUtils = require('../lib/challengeUtils')
 import { Request, Response, NextFunction } from 'express'
 
@@ -15,7 +16,7 @@ module.exports = function productReviews () {
   return (req: Request, res: Response, next: NextFunction) => {
     const user = security.authenticatedUsers.from(req) // vuln-code-snippet vuln-line forgedReviewChallenge
     db.reviews.update( // vuln-code-snippet neutral-line forgedReviewChallenge
-      { _id: req.body.id }, // vuln-code-snippet vuln-line noSqlReviewsChallenge forgedReviewChallenge
+      { _id: mongoSanitize.sanitize({ data: req.body.id }).data }, // vuln-code-snippet vuln-line noSqlReviewsChallenge forgedReviewChallenge
       { $set: { message: req.body.message } },
       { multi: true } // vuln-code-snippet vuln-line noSqlReviewsChallenge
     ).then(
